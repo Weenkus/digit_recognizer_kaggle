@@ -14,3 +14,9 @@ Started: 8:43 pm, Wednesday 25 July 2012 UTC
 Ends: 11:59 pm, Saturday 31 December 2016 UTC (1,620 total days) 
 Points: this competition does not award ranking points 
 Tiers: this competition does not count towards tiers
+
+
+Results
+----------------------------------------------- 
+0.98486 kaggle leaderboard for 5 min of training (CPU, 3500 epochs)
+
