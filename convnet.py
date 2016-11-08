@@ -3,6 +3,7 @@ import pandas as pd
 
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
+from cytoolz.itertoolz import accumulate
 
 
 def main():
@@ -54,7 +55,7 @@ class DataHelper(object):
 
 
 class TFConvNet(object):
-    def __init__(self, feature_num, class_num, is_training, epochs=3500, batch_size=50, learning_rate=5e-4):
+    def __init__(self, feature_num, class_num, is_training, epochs=5000, batch_size=50, learning_rate=5e-4):
         self.batch_size = batch_size
         self.epochs = epochs
         self.weight_decay = 1e-3
@@ -86,15 +87,15 @@ class TFConvNet(object):
         ):
             self.X = tf.reshape(self.X, [-1, 28, 28, 1])
 
-            net = layers.convolution2d(self.X, num_outputs=16, kernel_size=5, scope='conv1')
+            net = layers.convolution2d(self.X, num_outputs=16, scope='conv1')
             net = layers.max_pool2d(net, kernel_size=2, stride=2, scope='pool1')
-            net = layers.convolution2d(net, num_outputs=32, kernel_size=5, scope='conv2')
+            net = layers.convolution2d(net, num_outputs=32, scope='conv2')
             net = layers.max_pool2d(net, kernel_size=2, stride=2, scope='pool2')
             net = layers.relu(net, num_outputs=32)
 
             net = layers.flatten(net, [-1, 7 * 7 * 32])
             net = layers.fully_connected(net, num_outputs=64, activation_fn=tf.nn.relu, scope='fc1')
-            net = layers.fully_connected(net, num_outputs=self.class_num, scope='fc2')
+            net = layers.fully_connected(net, num_outputs=self.class_num, accumulate=tf.nn.relu, scope='fc2')
             self.y = layers.softmax(net, scope='softmax')
 
         self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(self.y, self.y_))
