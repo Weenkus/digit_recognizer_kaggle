@@ -55,7 +55,7 @@ class DataHelper(object):
 
 
 class TFConvNet(object):
-    def __init__(self, feature_num, class_num, is_training, epochs=5000, batch_size=50, learning_rate=5e-4):
+    def __init__(self, feature_num, class_num, is_training, epochs=2000, batch_size=50, learning_rate=0.001):
         self.batch_size = batch_size
         self.epochs = epochs
         self.weight_decay = 1e-3
@@ -88,14 +88,16 @@ class TFConvNet(object):
             self.X = tf.reshape(self.X, [-1, 28, 28, 1])
 
             net = layers.convolution2d(self.X, num_outputs=16, scope='conv1')
-            net = layers.max_pool2d(net, kernel_size=2, stride=2, scope='pool1')
+            net = layers.max_pool2d(net, kernel_size=2, scope='pool1')
+
             net = layers.convolution2d(net, num_outputs=32, scope='conv2')
-            net = layers.max_pool2d(net, kernel_size=2, stride=2, scope='pool2')
+            net = layers.batch_norm(net)
+            net = layers.max_pool2d(net, kernel_size=2, scope='pool2')
             net = layers.relu(net, num_outputs=32)
 
             net = layers.flatten(net, [-1, 7 * 7 * 32])
             net = layers.fully_connected(net, num_outputs=64, activation_fn=tf.nn.relu, scope='fc1')
-            net = layers.fully_connected(net, num_outputs=self.class_num, accumulate=tf.nn.relu, scope='fc2')
+            net = layers.fully_connected(net, num_outputs=self.class_num, activation_fn=tf.nn.relu, scope='fc2')
             self.y = layers.softmax(net, scope='softmax')
 
         self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(self.y, self.y_))
@@ -118,13 +120,17 @@ class TFConvNet(object):
                 feed_dict={self.X: X_train[batch_start:batch_end], self.y_: y_train[batch_start:batch_end]}
             )
 
-            if iteration % 100 == 0:
+            if iteration % 50 == 0:
                 acc = self.sess.run(
                     self.acc,
                     feed_dict={self.X: X_train[batch_start:batch_end], self.y_: y_train[batch_start:batch_end]}
                 )
 
-                print('Iteration: {}, loss: {:2.4}, train acc: {:.2%}'.format(iteration, loss, acc))
+                print('Iteration: {}, loss: {:2.4}, train acc: {:.3%}'.format(iteration, loss, acc))
+
+                if acc >= 0.97:
+                    print('Training acc too high, breaking')
+                    break
 
             batch_start = batch_end
             batch_end += self.batch_size
