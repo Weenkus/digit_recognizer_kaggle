@@ -12,6 +12,8 @@ def main():
     test_x = data_helper.load_data('dataset/test.csv')
 
     train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2)
+    print('Train size:', len(train_x))
+    print('Validation size:', len(val_x))
 
     conv_net = TFConvNet(feature_num=784, class_num=10, is_training=False)
     conv_net.train(train_x, train_y, val_x, val_y, keep_prob=0.5)
@@ -57,7 +59,7 @@ class DataHelper(object):
 
 
 class TFConvNet(object):
-    def __init__(self, feature_num, class_num, is_training, epochs=500000, batch_size=100, learning_rate=0.001):
+    def __init__(self, feature_num, class_num, is_training, epochs=500000, batch_size=100, learning_rate=5e-4):
         self.batch_size = batch_size
         self.epochs = epochs
         self.weight_decay = 1e-3
@@ -98,11 +100,13 @@ class TFConvNet(object):
             net = layers.convolution2d(net, num_outputs=32)
             net = layers.convolution2d(net, num_outputs=32)
             net = layers.max_pool2d(net, kernel_size=2)
+            net = layers.dropout(net, keep_prob=self.keep_prob)
             net = layers.relu(net, num_outputs=32)
 
             net = layers.flatten(net, [-1, 7 * 7 * 32])
             net = layers.fully_connected(net, num_outputs=64, activation_fn=tf.nn.tanh)
             net = layers.dropout(net, keep_prob=self.keep_prob)
+
             net = layers.fully_connected(net, num_outputs=self.class_num, activation_fn=tf.nn.tanh)
             self.y = layers.softmax(net)
 
@@ -145,7 +149,7 @@ class TFConvNet(object):
                 print('Iteration: {}, loss: {:2.4}, train acc: {:.3%}, validation acc: {:.3%}'.format(
                     iteration, loss, train_acc, val_acc))
 
-                if val_acc >= 0.99:
+                if val_acc >= 0.991:
                     print('Validation acc good! Breaking!')
                     break
 
