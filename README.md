@@ -18,5 +18,6 @@ Tiers: this competition does not count towards tiers
 
 Results
 ----------------------------------------------- 
-0.98486 kaggle leaderboard for 5 min of training (CPU, 3500 epochs)
+0.98486 kaggle leaderboard for 5 min of training (CPU, 3500 iterations)
+0.99071 kaggle leaderboard for 15 min of training (GPU, 7000 iterations)
 
