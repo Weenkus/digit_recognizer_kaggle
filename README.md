@@ -18,5 +18,5 @@ Tiers: this competition does not count towards tiers
 
 Results
 ----------------------------------------------- 
-0.99071 kaggle leaderboard for 15 min of training (GPU, 7000 iterations)
+0.99071 kaggle leaderboard score for 15 min of training (GPU 650m, 7000 iterations)
 
